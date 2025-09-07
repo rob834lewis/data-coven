@@ -1,8 +1,5 @@
 ChatGPT said:
 
-Perfect — it’s really important to never accidentally commit secrets (like GCP service account keys) into Git. Let’s expand your .gitignore to cover that:
-
-? Updated .gitignore with GCP/BigQuery safety
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
