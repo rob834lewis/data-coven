@@ -1,0 +1,57 @@
+ChatGPT said:
+
+Perfect — it’s really important to never accidentally commit secrets (like GCP service account keys) into Git. Let’s expand your .gitignore to cover that:
+
+? Updated .gitignore with GCP/BigQuery safety
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Environment files
+*.env
+.env.*
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# PyInstaller
+*.spec
+
+# Logs
+*.log
+
+# Unit test / coverage reports
+.coverage
+*.cover
+*.py,cover
+htmlcov/
+
+# mypy
+.mypy_cache/
+
+# VSCode settings
+.vscode/
+
+# GCP / BigQuery
+# Service account keys (JSON)
+*-key.json
+service-account.json
+
+# If you use terraform or gcloud configs locally
+.terraform/
+terraform.tfstate*
+.gcloud/
+*.yaml
+
+# Local configs (API keys, creds, etc.)
+config.yaml
+config.yml
+credentials/
