@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 """
 ---------------------------------------------------------------------------------------------------
     Written by      : Rob Lewis
@@ -96,8 +96,8 @@ logger.info(f"Staging stored: {staging_prefix}{staging_filename}")
 # Step 3: Curate for output (select only EUR, GBP, USD)
 # ---
 
-final_df = df[['date', 'EUR', 'USD', 'GBP']]   # Keep only useful columns
-final_filename = f"ecb_rates_final_{today}.csv"  # Output filename
+final_df       = df[['date', 'EUR', 'USD', 'GBP']]  # Keep only useful columns
+final_filename = f"ecb_rates_final_{today}.csv"     # Output filename
 
 # Save curated file into output/
 upload_to_gcs(gcp_bucket, output_prefix, final_filename, final_df.to_csv(index=False))
@@ -118,3 +118,66 @@ df['GBP_base_USD'] = df['USD'] / df['GBP']
 df['USD_base_GBP'] = df['GBP'] / df['USD']
 
 """
+
+# ---
+# Step 5: Upload into BigQuery
+# ---
+
+
+dataset_name = "exchange_rates"
+table_name   = "daily_rates"
+
+# Create a BigQuery client object, connected to the specified GCP project.
+# This client will be used to interact with BigQuery (create datasets, load tables, run queries, etc.)
+client = bigquery.Client(project=gcp_project)  
+
+# Construct the full dataset ID using the project ID and the dataset name.
+dataset_id = f"{client.project}.{dataset_name}"
+
+def bq_create_dataset(client, dataset_name):
+
+    try:
+        dataset = client.get_dataset(dataset_id)  # Try to fetch dataset
+        logger.info(f"Dataset {dataset_id} already exists.")
+
+    except NotFound:
+        # Create a Dataset object in memory. This does NOT create it in BigQuery yet.
+        dataset = bigquery.Dataset(dataset_id)
+
+        # Specify the location of the dataset in BigQuery.
+        # "EU" ensures that the dataset is stored in European data centers (matches the bucket location).
+        dataset.location = "EU"
+
+        # Actually create the dataset in BigQuery.
+        # The parameter exists_ok=True means that if the dataset already exists, it won't throw an error.
+        client.create_dataset(dataset, exists_ok=True)
+        
+        logger.info(f"Created dataset {dataset_id}")
+
+bq_create_dataset(client, dataset_name)
+
+
+# ---
+# Define schema for bigquery
+# ---
+
+
+
+# Ensure DataFrame columns match schema names and types
+
+table_id = f"{dataset_name}.{table_name}"
+
+table_schema = [
+    {"name": "date", "type": "DATE" , "mode": "NULLABLE"},
+    {"name": "EUR",  "type": "FLOAT", "mode": "NULLABLE"},
+    {"name": "USD",  "type": "FLOAT", "mode": "NULLABLE"},
+    {"name": "GBP",  "type": "FLOAT", "mode": "NULLABLE"}
+]
+
+pandas_gbq.to_gbq(
+    df,
+    table_id,
+    project_id=gcp_project,
+    if_exists="replace",
+    table_schema=table_schema
+)

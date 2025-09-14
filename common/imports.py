@@ -14,6 +14,7 @@
     Modifications
     -------------
     07SEP2025   RLEWIS  Initial Version
+    14SEP2025   RLEWIS  Added bigquery & pandas_gbq imports
 ---------------------------------------------------------------------------------------------------
 """
 
@@ -28,6 +29,7 @@ import requests                     # For making HTTP requests
 import xml.etree.ElementTree as ET  # For parsing XML files
 import logging                      # For creating logs
 
-from google.cloud import storage    # For interacting with Google Cloud Storage (GCS)
-from datetime     import datetime, date, timedelta   # For generating dates
-from dateutil.relativedelta import relativedelta     # For working with timedeltas
+from google.cloud           import storage, bigquery          # For interacting with Google Cloud Storage (GCS) and bigquery
+from datetime               import datetime, date, timedelta  # For generating dates
+from dateutil.relativedelta import relativedelta              # For working with timedeltas
+import pandas_gbq

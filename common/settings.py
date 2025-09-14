@@ -113,9 +113,10 @@ set_bank_hols = set([
 # server details
 hostname, ip_address = get_server_info()
 
-# gcp bucket details
+# gcp details
 # <WILL NEED TO INCLUDE CHECK ON ENVIRONMENT HERE DEV,UAT OR PROD>
-gcp_bucket = "data-coven-dev-eu-west2-001"  # Your GCS bucket name
+gcp_project = "data-coven-dev"
+gcp_bucket  = "data-coven-dev-eu-west2-001"  # Your GCS bucket name
 
 # log directory
 log_dir = "/srv/data_coven/logs"
