@@ -14,6 +14,7 @@
     Modifications
     -------------
     11SEP2025   RLEWIS  Initial Version 
+    14SEP2025   RLEWIS  Updated dev gcp bucket name
 -------------------------------------------------------------------------------------------------------------------
 """
 
@@ -114,5 +115,7 @@ hostname, ip_address = get_server_info()
 
 # gcp bucket details
 # <WILL NEED TO INCLUDE CHECK ON ENVIRONMENT HERE DEV,UAT OR PROD>
-gcp_bucket = "cicd-demo-dev-eu-west2-001"  # Your GCS bucket name
+gcp_bucket = "data-coven-dev-eu-west2-001"  # Your GCS bucket name
 
+# log directory
+log_dir = "/srv/data_coven/logs"

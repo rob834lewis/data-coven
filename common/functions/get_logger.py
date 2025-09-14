@@ -14,6 +14,7 @@
   Modifications
   -------------
   11SEP2025   RLEWIS  Initial Version
+  14SEP2025   RLEWIS  Updated log dir call
 ----------------------------------------------------------------------------------------------------------------------:
 """
 
@@ -27,15 +28,16 @@ from globals import *
 # --- Function ---
 # ----------------
 
-def get_logger(name: str, log_dir: str = "logs") -> logging.Logger:
+def get_logger(name: str, log_dir: str = log_dir) -> logging.Logger:
     """Return a logger that writes to both console and rotating file."""
+    # Ensure the log folder exists
     os.makedirs(log_dir, exist_ok=True)
     logfile = os.path.join(log_dir, f"{name}.log")
 
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
 
-    # Prevent duplicate handlers if called multiple times
+    # Prevent duplicate handlers
     if logger.handlers:
         return logger
 
@@ -55,3 +57,5 @@ def get_logger(name: str, log_dir: str = "logs") -> logging.Logger:
     logger.addHandler(fh)
 
     return logger
+
+
