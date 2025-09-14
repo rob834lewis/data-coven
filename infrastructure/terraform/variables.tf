@@ -1,7 +1,23 @@
+# -------------------------------------------------------------------------------------------------------------------
+#    Written by      : Rob Lewis
+#
+#    Date            : 07SEP2025
+#
+#    Purpose         : Variables for use in terraform setup
+#
+#    Dependencies    :
+#
+#    Program name    : variables
+#
+#    Modifications
+#    -------------
+#    07SEP2025   RLEWIS  Initial Version
+#    14SEP2025   RLEWIS  Altered for use with multiple projects for each environment
+# ------------------------------------------------------------------------------------------------------------------- 
+
 variable "project_id" {
   type        = string
-  description = "GCP Project ID"
-  default     = "cicd-demo-468415"
+  description = "GCP Project ID for this environment"
 }
 
 variable "region" {
@@ -10,15 +26,14 @@ variable "region" {
   default     = "europe-west2"
 }
 
-variable "environments" {
-  type        = list(string)
-  description = "List of environments"
-  default     = ["dev", "uat", "prod"]
+variable "environment" {
+  type        = string
+  description = "Environment name: dev, uat, prd"
 }
 
 variable "folders" {
   type        = list(string)
-  description = "Folder structure inside each bucket"
+  description = "Folder structure inside the bucket"
   default     = ["archive", "output", "raw", "staging", "temp"]
 }
 

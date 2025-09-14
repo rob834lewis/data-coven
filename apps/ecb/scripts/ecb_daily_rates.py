@@ -22,7 +22,7 @@
 # --- Imports ---
 # ---------------
 
-from globals          import *
+from globals import *
 from common.functions import upload_to_gcs, wdays, get_logger
 
 # ---------------
