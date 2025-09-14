@@ -1,2 +1,2 @@
-# data-coven
-Apps for Data Coven
+# cicd-demo
+CICD Practice
