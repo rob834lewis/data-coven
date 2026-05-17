@@ -1,7 +1,0 @@
-services:
-  data-coven-dev:
-    build: .
-    container_name: data-coven-dev
-    working_dir: /data-coven
-    environment:
-      APP_ENV: dev
