@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Vagrant
+.vagrant/
+
+# VirtualBox
+*.vbox
+*.vdi
+*.vmdk
