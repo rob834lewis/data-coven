@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PocketQuest - Week</title>
+</head>
+<body>
+
+    <h1>PocketQuest</h1>
+
+    <h2>Hello {{ player_name }}</h2>
+
+    <p>
+        Weekly allowance:
+        <strong>£{{ allowance }}</strong>
+
+    </p>
+
+    <hr>
+
+    <h3>Money Pots</h3>
+
+    <p>Spend: £{{ spend }}</p>
+    <p>Save: £{{ save }}</p>
+    <p>Share: £{{ share }}</p>
+
+    <hr>
+
+    <h3>Goal</h3>
+
+    <p>
+        Save £{{ goal.target }} for a {{ goal.name }}
+    </p>
+
+    <p>
+        Progress:
+        £{{ save }} / £{{ goal.target }}
+    </p>
+
+    <p>
+        {{ goal_progress }}% complete
+    </p>
+
+    <progress
+        value="{{ save }}"
+        max="{{ goal.target }}">
+    </progress>
+
+    <hr>
+
+    <h3>This Week's Event</h3>
+
+    <p>
+        <strong>{{ event.name }}</strong>
+    </p>
+
+    <p>
+        {{ event.message }}
+    </p>
+
+    <p>
+        Cost: £{{ event.cost }}
+    </p>
+
+    <hr>
+
+    <h3>Allocate your money</h3>
+
+    <form method="POST">
+
+        <label>Spend</label>
+        <input
+            type="number"
+            name="spend"
+            value="0"
+            min="0"
+        >
+
+        <br><br>
+
+        <label>Save</label>
+        <input
+            type="number"
+            name="save"
+            value="0"
+            min="0"
+        >
+
+        <br><br>
+
+        <label>Share</label>
+        <input
+            type="number"
+            name="share"
+            value="0"
+            min="0"
+        >
+
+        <br><br>
+
+        <button type="submit">
+            Allocate
+        </button>
+
+    </form>
+
+    {% if error %}
+        <p style="color: red;">
+            {{ error }}
+        </p>
+    {% endif %}
+
+</body>
+</html>
