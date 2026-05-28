@@ -9,13 +9,29 @@ import os
 from flask import Flask, render_template, request, redirect, url_for
 
 # Import game logic functions
-from game_logic import (
+from src.apps.financeferret.game_logic import (
     WEEKLY_ALLOWANCE,
     BIKE_GOAL,
     calculate_goal_progress,
     validate_money_allocation,
     get_random_event,
 )
+
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
+
+from werkzeug.security import generate_password_hash
+
+from src.apps.financeferret.models import UserAccount
+
+from src.common.env_loader import load_env
+
+load_env()
+
+
+engine = create_engine(DATABASE_URL)
+Session = sessionmaker(bind=engine)
+
 
 # Create the Flask application
 #
@@ -226,10 +242,6 @@ if __name__ == "__main__":
     # - error messages
     # - developer tools
     #
-    #app.run(
-    #    debug=debug_mode
-    #)
-
     app.run(
-        debug=True
+        debug=debug_mode
     )
