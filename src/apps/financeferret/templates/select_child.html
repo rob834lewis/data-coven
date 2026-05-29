@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Active Child - Finance Ferret</title>
+</head>
+<body>
+
+    <h1>Select Active Child</h1>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    {% if children %}
+
+        <form method="POST" action="/select-child">
+
+            <label for="child_id">
+                Choose a child:
+            </label>
+
+            <select
+                id="child_id"
+                name="child_id"
+                required
+            >
+
+                {% for child in children %}
+
+                    <option
+                        value="{{ child.id }}"
+                    >
+                        {{ child.child_name }}
+                        {% if child.age %}
+                            (Age {{ child.age }})
+                        {% endif %}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+            <br><br>
+
+            <button type="submit">
+                Set Active Child
+            </button>
+
+        </form>
+
+    {% else %}
+
+        <p>
+            No children have been created yet.
+        </p>
+
+    {% endif %}
+
+    <br>
+
+    <p>
+        <a href="/add-child">
+            Add Child
+        </a>
+    </p>
+
+    <p>
+        <a href="/">
+            Return Home
+        </a>
+    </p>
+
+</body>
+</html>
