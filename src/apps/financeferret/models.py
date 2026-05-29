@@ -20,7 +20,7 @@ class UserAccount(Base):
 
     children = relationship("ChildProfile", back_populates="user")
 
-"""
+
 class ChildProfile(Base):
     __tablename__ = "child_profile"
 
@@ -31,10 +31,10 @@ class ChildProfile(Base):
     created_at = Column(DateTime, server_default=func.now())
 
     user = relationship("UserAccount", back_populates="children")
-    allocations = relationship("Allocation", back_populates="child")
-    goals = relationship("Goal", back_populates="child")
+    #allocations = relationship("Allocation", back_populates="child")
+    #goals = relationship("Goal", back_populates="child")
 
-
+"""
 class Allocation(Base):
     __tablename__ = "allocation"
 

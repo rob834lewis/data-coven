@@ -28,38 +28,56 @@ from src.common.config import config
 from src.common.secrets import secrets
 
 
+# -----------------
+# --- Functions ---
+# -----------------
+
 _ENGINES = {}
 _SESSIONMAKERS = {}
 
 
-def build_postgres_url(profile: dict) -> str:
+def build_postgres_url() -> str:
+    """
+    Build a PostgreSQL SQLAlchemy connection URL.
+
+    Config values come from config().
+    Secret values come from secrets().
+    """
+
+    config_data = config()
     secret_data = secrets()
-    profile = config()
 
     username = secret_data.get("db_user")
     password = secret_data.get("db_password")
 
-    engine = profile.get("db_engine")
-    host = profile.get("db_host")
-    port = profile.get("db_port")
-    database = profile.get("db_database")
+    db_engine = config_data.get("db_engine")
+    host = config_data.get("db_host")
+    port = config_data.get("db_port")
+    database = config_data.get("db_database")
 
     return (
-        f"{engine}://"
+        f"{db_engine}://"
         f"{username}:{password}@"
         f"{host}:{port}/"
         f"{database}"
     )
 
 
-def get_engine(profile_name: str):
+def get_engine(profile_name: str = "postgres.app"):
+    """
+    Return a cached SQLAlchemy engine.
+
+    The profile_name is used as the cache key.
+    """
+
     if profile_name in _ENGINES:
         return _ENGINES[profile_name]
 
-    if profile["ENGINE"].startswith("postgresql"):
-        database_url = build_postgres_url(
-            profile
-        )
+    config_data = config()
+    db_engine = config_data.get("db_engine")
+
+    if db_engine.startswith("postgresql"):
+        database_url = build_postgres_url()
 
         engine = create_engine(
             database_url
@@ -67,7 +85,7 @@ def get_engine(profile_name: str):
 
     else:
         raise ValueError(
-            f"Unsupported database engine: {profile['ENGINE']}"
+            f"Unsupported database engine: {db_engine}"
         )
 
     _ENGINES[profile_name] = engine
@@ -75,7 +93,14 @@ def get_engine(profile_name: str):
     return engine
 
 
-def get_session(profile_name: str):
+def get_session(profile_name: str = "postgres.app"):
+    """
+    Return a new database session.
+
+    The sessionmaker is cached.
+    The session itself is new each time.
+    """
+
     if profile_name not in _SESSIONMAKERS:
         engine = get_engine(
             profile_name

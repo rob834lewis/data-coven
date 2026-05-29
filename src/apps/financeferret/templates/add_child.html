@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Child - Finance Ferret</title>
+</head>
+<body>
+
+    <h1>Add child profile</h1>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST" action="/add-child">
+
+        <label>Child name</label>
+        <input type="text" name="child_name" required>
+
+        <br><br>
+
+        <label>Age</label>
+        <input type="number" name="age" min="1" max="18">
+
+        <br><br>
+
+        <button type="submit">Add child</button>
+
+    </form>
+
+    <p>
+        <a href="/">Back to home</a>
+    </p>
+
+</body>
+</html>

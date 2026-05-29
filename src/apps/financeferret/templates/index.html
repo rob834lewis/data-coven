@@ -2,16 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PocketQuest</title>
+    <title>Finance Ferret</title>
 </head>
 <body>
-    <main>
-        <h1>PocketQuest</h1>
-        <p>Learn money by living a simulated life.</p>
 
-        <a href="/start">
-            <button>Start Game</button>
-        </a>
-    </main>
+    <h1>Finance Ferret</h1>
+
+    <p>Learn money by building your stash.</p>
+
+    {% if username %}
+
+        <p>
+            Logged in as <strong>{{ username }}</strong>
+        </p>
+
+        <p>
+            <a href="/add-child">Add child profile</a>
+        </p>
+
+        <p>
+            <a href="/logout">Logout</a>
+        </p>
+
+    {% else %}
+
+        <p>
+            <a href="/login">Login</a>
+        </p>
+
+        <p>
+            <a href="/register">Register</a>
+        </p>
+
+    {% endif %}
+
 </body>
 </html>
