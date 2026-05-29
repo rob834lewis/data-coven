@@ -16,6 +16,20 @@
             Logged in as <strong>{{ username }}</strong>
         </p>
 
+        {% if child_name %}
+
+            <p>
+                Active Child: <strong>{{ child_name }}</strong>
+            </p>
+
+        {% else %}
+
+            <p>
+                <a href="/select-child">Select active child</a>
+            </p>
+
+        {% endif %}
+
         <p>
             <a href="/add-child">Add child profile</a>
         </p>

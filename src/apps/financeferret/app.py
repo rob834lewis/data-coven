@@ -71,12 +71,15 @@ app.secret_key = "dev-secret-key"
 def home():
 
     username = session.get(
-        "username"
+        "username",
     )
+
+    child_name = session.get("active_child_name")
 
     return render_template(
         "index.html",
-        username=username
+        username=username,
+        child_name=child_name
     )
 
 
@@ -368,6 +371,54 @@ def add_child():
 
     return render_template(
         "add_child.html",
+        error=error
+    )
+
+
+@app.route("/select-child", methods=["GET", "POST"])
+def select_child():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    error = None
+    db_session = get_session()
+
+    try:
+        if request.method == "POST":
+
+            child_id = request.form.get("child_id")
+
+            child = (
+                db_session.query(ChildProfile)
+                .filter_by(
+                    id=child_id,
+                    user_id=session["user_id"]
+                )
+                .first()
+            )
+
+            if child is None:
+                error = "Child profile not found."
+
+            else:
+                session["active_child_id"] = child.id
+                session["active_child_name"] = child.child_name
+
+                return redirect(url_for("home"))
+
+        children = (
+            db_session.query(ChildProfile)
+            .filter_by(user_id=session["user_id"])
+            .all()
+        )
+
+    finally:
+        db_session.close()
+
+    return render_template(
+        "select_child.html",
+        children=children,
         error=error
     )
 
