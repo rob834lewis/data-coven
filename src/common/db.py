@@ -1,8 +1,31 @@
+# -*- coding: utf-8 -*-
+"""
+---------------------------------------------------------------------------------------------------
+    Written by      : Rob Lewis
+
+    Date            : 28MAY2026
+
+    Purpose         : Database management
+
+    Dependencies    :
+
+    Program name    : db
+
+    Modifications
+    -------------
+    28MAY2026   RLEWIS  Initial Version
+---------------------------------------------------------------------------------------------------
+"""
+
+# ---------------
+# --- Imports ---
+# ---------------
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.common.config import get_connection_profile
-from src.common.secrets import get_secret
+from src.common.config import config
+from src.common.secrets import secrets
 
 
 _ENGINES = {}
@@ -10,25 +33,28 @@ _SESSIONMAKERS = {}
 
 
 def build_postgres_url(profile: dict) -> str:
-    password = get_secret(
-        profile["PASSWORD_SECRET"]
-    )
+    secret_data = secrets()
+    profile = config()
+
+    username = secret_data.get("db_user")
+    password = secret_data.get("db_password")
+
+    engine = profile.get("db_engine")
+    host = profile.get("db_host")
+    port = profile.get("db_port")
+    database = profile.get("db_database")
 
     return (
-        f"{profile['ENGINE']}://"
-        f"{profile['USERNAME']}:{password}@"
-        f"{profile['HOST']}:{profile['PORT']}/"
-        f"{profile['DATABASE']}"
+        f"{engine}://"
+        f"{username}:{password}@"
+        f"{host}:{port}/"
+        f"{database}"
     )
 
 
 def get_engine(profile_name: str):
     if profile_name in _ENGINES:
         return _ENGINES[profile_name]
-
-    profile = get_connection_profile(
-        profile_name
-    )
 
     if profile["ENGINE"].startswith("postgresql"):
         database_url = build_postgres_url(
