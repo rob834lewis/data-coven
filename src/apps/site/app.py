@@ -1,12 +1,15 @@
-import os
 from flask import Flask
 
-app = Flask(__name__)
+from src.apps.site.routes import site_bp
 
 
-@app.route("/")
-def home():
-    return "Hello World"
+def create_app():
+    app = Flask(__name__)
+    app.register_blueprint(site_bp)
+    return app
+
+
+app = create_app()
 
 
 if __name__ == "__main__":

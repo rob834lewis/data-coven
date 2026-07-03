@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Coven</title>
+</head>
+<body>
+    <h1>Data Coven</h1>
+
+    <p>
+        Python, data engineering, automation, dashboards and small practical apps.
+    </p>
+
+    <h2>Projects</h2>
+
+    {% for project in projects %}
+        <section>
+            <h3>{{ project.name }}</h3>
+
+            <p>{{ project.description }}</p>
+
+            <p>
+                <strong>Tech:</strong>
+                {{ project.technologies | join(", ") }}
+            </p>
+        </section>
+    {% endfor %}
+</body>
+</html>
