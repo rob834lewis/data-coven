@@ -34,4 +34,3 @@ engine = get_engine()
 with engine.begin() as connection:
     connection.execute(text("CREATE SCHEMA IF NOT EXISTS financeferret"))
     Base.metadata.create_all(connection)
-

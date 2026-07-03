@@ -1,9 +1,13 @@
 from sqlalchemy import (
-    Column, Integer, String, Boolean, DateTime,
-    ForeignKey, MetaData, func
+    Column,
+    Integer,
+    String,
+    DateTime,
+    ForeignKey,
+    MetaData,
+    func,
 )
 from sqlalchemy.orm import declarative_base, relationship
-
 
 metadata = MetaData(schema="financeferret")
 Base = declarative_base(metadata=metadata)
@@ -25,14 +29,53 @@ class ChildProfile(Base):
     __tablename__ = "child_profile"
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("financeferret.user_account.id"), nullable=False)
+
+    user_id = Column(
+        Integer,
+        ForeignKey("financeferret.user_account.id"),
+        nullable=False,
+    )
+
     child_name = Column(String(100), nullable=False)
-    age = Column(Integer)
+
+    age = Column(Integer, nullable=False)
+
+    weekly_allowance = Column(
+        Integer,
+        nullable=False,
+        default=20,
+    )
+
     created_at = Column(DateTime, server_default=func.now())
 
     user = relationship("UserAccount", back_populates="children")
-    #allocations = relationship("Allocation", back_populates="child")
-    #goals = relationship("Goal", back_populates="child")
+    # allocations = relationship("Allocation", back_populates="child")
+    # goals = relationship("Goal", back_populates="child")
+
+
+class WeeklyAllocation(Base):
+    __tablename__ = "weekly_allocation"
+
+    id = Column(Integer, primary_key=True)
+
+    child_id = Column(
+        Integer,
+        ForeignKey("financeferret.child_profile.id"),
+        nullable=False,
+    )
+
+    week_number = Column(Integer, nullable=False)
+
+    allowance = Column(Integer, nullable=False)
+
+    spend = Column(Integer, nullable=False, default=0)
+    save = Column(Integer, nullable=False, default=0)
+    share = Column(Integer, nullable=False, default=0)
+
+    created_at = Column(DateTime, server_default=func.now())
+
+    child = relationship("ChildProfile")
+
 
 """
 class Allocation(Base):

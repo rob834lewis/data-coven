@@ -21,13 +21,15 @@
 # --- Imports ---
 # ---------------
 
-import os, configparser
+import os
+import configparser
 
 from src.common.env_loader import load_env
 
 # -----------------
 # --- Functions ---
 # -----------------
+
 
 def config():
 
@@ -49,14 +51,14 @@ def config():
         config.read(config_path)
 
         # Access the username and password from the 'dev.postgres' section
-        db_engine = config.get('dev.postgres', 'ENGINE')
-        db_host = config.get('dev.postgres', 'HOST')
-        db_port = config.get('dev.postgres', 'PORT')
-        db_database = config.get('dev.postgres', 'DATABASE')
+        db_engine = config.get("dev.postgres", "ENGINE")
+        db_host = config.get("dev.postgres", "HOST")
+        db_port = config.get("dev.postgres", "PORT")
+        db_database = config.get("dev.postgres", "DATABASE")
 
     return {
         "db_engine": db_engine,
         "db_host": db_host,
         "db_port": db_port,
-        "db_database": db_database
+        "db_database": db_database,
     }

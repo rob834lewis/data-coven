@@ -21,13 +21,15 @@
 # --- Imports ---
 # ---------------
 
-import os, configparser
+import os
+import configparser
 
 from src.common.env_loader import load_env
 
 # -----------------
 # --- Functions ---
 # -----------------
+
 
 def secrets():
 
@@ -49,11 +51,14 @@ def secrets():
         config.read(secrets_path)
 
         # Access the username and password from the 'dev.postgres' section
-        db_user = config.get('dev.postgres', 'USERNAME')
-        db_password = config.get('dev.postgres', 'PASSWORD')
+        db_user = config.get("dev.postgres", "USERNAME")
+        db_password = config.get("dev.postgres", "PASSWORD")
+
+        # Read the flask secret key from the 'dev.flask' section
+        flask_secret_key = config.get("dev.flask", "SECRET_KEY")
 
     return {
-        "db_user": db_user, 
-        "db_password": db_password
+        "db_user": db_user,
+        "db_password": db_password,
+        "flask_secret_key": flask_secret_key,
     }
-

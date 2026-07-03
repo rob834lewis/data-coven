@@ -1,54 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Finance Ferret</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-    <h1>Finance Ferret</h1>
+{% block title %}Finance Ferret{% endblock %}
 
-    <p>Learn money by building your stash.</p>
+{% block content %}
 
     {% if username %}
 
-        <p>
-            Logged in as <strong>{{ username }}</strong>
-        </p>
-
         {% if child_name %}
 
+            <h2>Hello, {{ child_name }}, are you ready to start saving?</h2>
+
             <p>
-                Active Child: <strong>{{ child_name }}</strong>
+                <a href="/weekly_allocation">Start Saving</a>
             </p>
 
         {% else %}
 
+            <h2>Hello, {{ username }}, please select a child.</h2>
+
             <p>
-                <a href="/select-child">Select active child</a>
+                <a href="/select-child">Select a child</a>
             </p>
 
         {% endif %}
 
-        <p>
-            <a href="/add-child">Add child profile</a>
-        </p>
-
-        <p>
-            <a href="/logout">Logout</a>
-        </p>
 
     {% else %}
 
+        <h2>Teach money skills through play</h2>
+
+        <img
+            src="{{ url_for('static', filename='img/finance_ferret_full.png') }}"
+            alt="Finance Ferret"
+            class="welcome-mascot"
+        >
+
         <p>
-            <a href="/login">Login</a>
+            Finance Ferret helps children practise spending,
+            saving and sharing through simple weekly money choices.
+        </p>
+
+        <div class="home-actions">
+            <a class="button-link" href="/register">Create account</a>
+            <a class="button-link secondary" href="/login">Login</a>
+        </div>
+
+        <hr>
+
+        <h3>How it works</h3>
+
+        <p>
+            Set a weekly allowance, choose a child profile, then help them split
+            their money between Spend, Save and Share.
         </p>
 
         <p>
-            <a href="/register">Register</a>
+            Over time, Finance Ferret can introduce goals, surprises and simple
+            money lessons in an age-appropriate way.
         </p>
+
+        <hr>
+
+        <h3>The Three Money Choices</h3>
+
+        <div class="pillar-container">
+
+            <div class="pillar-card">
+
+                <h4>💰 Spend</h4>
+
+                <p>
+                    Use money on things you enjoy today.
+                </p>
+
+            </div>
+
+            <div class="pillar-card">
+
+                <h4>🌱 Save</h4>
+
+                <p>
+                    Put money aside for bigger goals later.
+                </p>
+
+            </div>
+
+            <div class="pillar-card">
+
+                <h4>❤️ Share</h4>
+
+                <p>
+                    Give some money to help others.
+                </p>
+
+            </div>
+
+        </div>
 
     {% endif %}
 
-</body>
-</html>
+{% endblock %}

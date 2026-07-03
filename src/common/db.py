@@ -27,7 +27,6 @@ from sqlalchemy.orm import sessionmaker
 from src.common.config import config
 from src.common.secrets import secrets
 
-
 # -----------------
 # --- Functions ---
 # -----------------
@@ -55,12 +54,7 @@ def build_postgres_url() -> str:
     port = config_data.get("db_port")
     database = config_data.get("db_database")
 
-    return (
-        f"{db_engine}://"
-        f"{username}:{password}@"
-        f"{host}:{port}/"
-        f"{database}"
-    )
+    return f"{db_engine}://" f"{username}:{password}@" f"{host}:{port}/" f"{database}"
 
 
 def get_engine(profile_name: str = "postgres.app"):
@@ -79,14 +73,10 @@ def get_engine(profile_name: str = "postgres.app"):
     if db_engine.startswith("postgresql"):
         database_url = build_postgres_url()
 
-        engine = create_engine(
-            database_url
-        )
+        engine = create_engine(database_url)
 
     else:
-        raise ValueError(
-            f"Unsupported database engine: {db_engine}"
-        )
+        raise ValueError(f"Unsupported database engine: {db_engine}")
 
     _ENGINES[profile_name] = engine
 
@@ -102,12 +92,8 @@ def get_session(profile_name: str = "postgres.app"):
     """
 
     if profile_name not in _SESSIONMAKERS:
-        engine = get_engine(
-            profile_name
-        )
+        engine = get_engine(profile_name)
 
-        _SESSIONMAKERS[profile_name] = sessionmaker(
-            bind=engine
-        )
+        _SESSIONMAKERS[profile_name] = sessionmaker(bind=engine)
 
     return _SESSIONMAKERS[profile_name]()
