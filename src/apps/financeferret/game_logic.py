@@ -21,7 +21,7 @@
 WEEKLY_ALLOWANCE = 20
 
 
-def validate_money_allocation(spend_raw, save_raw, share_raw):
+def validate_money_allocation(spend_raw, save_raw, share_raw, allowance):
     """
     Validate how the player splits their weekly money.
 
@@ -35,6 +35,9 @@ def validate_money_allocation(spend_raw, save_raw, share_raw):
 
     share_raw:
         Raw value from the form for Share.
+
+    allowance:
+        The total weekly allowance available for allocation.
 
     These values are "raw" because data from an HTML form
     arrives as text, even if the input type is number.
@@ -123,10 +126,9 @@ def validate_money_allocation(spend_raw, save_raw, share_raw):
     # The player only has WEEKLY_ALLOWANCE available.
     #
     # If they allocate more than that, reject the input.
-    if total_allocated > WEEKLY_ALLOWANCE:
+    if total_allocated > allowance:
         result["error"] = (
-            f"You only have £{WEEKLY_ALLOWANCE}. "
-            f"You tried to use £{total_allocated}."
+            f"You only have £{allowance}. " f"You tried to use £{total_allocated}."
         )
         return result
 
@@ -156,9 +158,7 @@ def calculate_goal_progress(saved_amount, goal_target):
     towards a savings goal.
     """
 
-    progress_percent = int(
-        (saved_amount / goal_target) * 100
-    )
+    progress_percent = int((saved_amount / goal_target) * 100)
 
     return min(progress_percent, 100)
 

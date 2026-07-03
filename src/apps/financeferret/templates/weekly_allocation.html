@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Finance Ferret{% endblock %}
+
+{% block content %}
+
+    <h1>Week {{ week_number }}</h1>
+
+    <p>
+        Active child:
+        <strong>{{ child.child_name }}</strong>
+    </p>
+
+    <p>
+        Weekly allowance:
+        <strong>£{{ child.weekly_allowance }}</strong>
+    </p>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    {% if success %}
+        <p style="color: green;">{{ success }}</p>
+    {% endif %}
+
+    <form method="POST" action="/weekly_allocation">
+
+        <label>Spend</label>
+        <input type="number" name="spend" min="0" value="0" required>
+
+        <br><br>
+
+        <label>Save</label>
+        <input type="number" name="save" min="0" value="0" required>
+
+        <br><br>
+
+        <label>Share</label>
+        <input type="number" name="share" min="0" value="0" required>
+
+        <br><br>
+
+        <button type="submit">Save allocation</button>
+
+    </form>
+
+    {% if allocation %}
+        <hr>
+
+        <h2>This week’s allocation</h2>
+
+        <p>Spend: £{{ allocation.spend }}</p>
+        <p>Save: £{{ allocation.save }}</p>
+        <p>Share: £{{ allocation.share }}</p>
+    {% endif %}
+
+    {% if event %}
+        <hr>
+
+        <h2>Random event</h2>
+
+        <p>
+            <strong>{{ event.name }}</strong>
+        </p>
+
+        <p>
+            {{ event.message }}
+        </p>
+    {% endif %}
+
+    <p>
+        <a href="/">Back home</a>
+    </p>
+
+{% endblock %}

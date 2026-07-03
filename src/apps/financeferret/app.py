@@ -1,227 +1,92 @@
+# -*- coding: utf-8 -*-
+"""
+---------------------------------------------------------------------------------------------------
+    Written by      : Rob Lewis
+
+    Date            : 25MAY2026
+
+    Purpose         : Finance Ferret web application
+
+    Dependencies    :
+
+    Program name    : app
+
+    Modifications
+    -------------
+    25MAY2026   RLEWIS  Initial Version
+---------------------------------------------------------------------------------------------------
+"""
+
+# ---------------
+# --- Imports ---
+# ---------------
+
 import os
 
-# Flask imports
-# Flask = main web application object
-# render_template = loads HTML files from /templates
-# request = reads information sent from forms
-# redirect = sends user to another page
-# url_for = builds URLs safely from route names
 from flask import Flask, render_template, request, redirect, url_for, session
 
 # Import game logic functions
 from src.apps.financeferret.game_logic import (
-    WEEKLY_ALLOWANCE,
-    BIKE_GOAL,
-    calculate_goal_progress,
     validate_money_allocation,
     get_random_event,
 )
 
 from sqlalchemy.exc import IntegrityError
 
-from werkzeug.security import generate_password_hash
-from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
-from src.apps.financeferret.models import UserAccount, ChildProfile
-
-
+from src.apps.financeferret.models import UserAccount, ChildProfile, WeeklyAllocation
 
 from src.common.env_loader import load_env
+from src.common.db import get_session
+from src.apps.financeferret.child_logic import validate_child_form
+from src.common.secrets import secrets
 
+# ----------------
+# --- Main App ---
+# ----------------
+
+# load environment variables from .env file
 load_env()
 
-
-#from src.common.db import get_engine
-
-from src.common.db import get_session
-
-#engine = get_engine()
-
-#Session = sessionmaker(bind=engine)
-
-
-# Create the Flask application
-#
-# __name__ tells Flask where this file lives
-# Flask uses this to find:
-# - templates/
-# - static/
-# - other resources
+# Create Flask app instance
 app = Flask(__name__)
 
-app.secret_key = "dev-secret-key"
+# Set secret key for session management - in production, this should be a secure random value stored in an environment variable or secrets manager
+secret_data = secrets()
 
-
+app.secret_key = secret_data.get("flask_secret_key")
 
 # --------------------------------------------------
 # HOME PAGE
 # --------------------------------------------------
 
-# @app.route() tells Flask:
-#
-# "When someone visits this URL,
-# run the function underneath it"
-#
-# "/" means:
-#
-# http://localhost:5000/
-#
-# This is the root/home page
+
 @app.route("/")
 def home():
 
-    username = session.get(
-        "username",
-    )
+    username = session.get("username")
 
     child_name = session.get("active_child_name")
 
-    return render_template(
-        "index.html",
-        username=username,
-        child_name=child_name
-    )
+    return render_template("index.html", username=username, child_name=child_name)
 
 
 # --------------------------------------------------
 # START PAGE
 # --------------------------------------------------
 
-# methods tells Flask which HTTP actions
-# this page accepts
-#
-# GET:
-# User asks to VIEW data/page
-#
-# Browser:
-# GET /start
-#
-# Example:
-# User clicks:
-# Start Game
-#
-# Flask returns the page
-#
-# POST:
-# User SENDS data to server
-#
-# Example:
-#
-# Name field:
-# Rob
-#
-# Browser sends:
-#
-# POST /start
-# player_name=Rob
-#
+
 @app.route("/start", methods=["GET", "POST"])
 def start():
 
-    # request.method tells us which
-    # type of HTTP request happened
-    #
-    # GET = show page
-    # POST = process form data
     if request.method == "POST":
 
-        # Get value from HTML form
-        #
-        # <input name="player_name">
-        #
-        # becomes:
-        #
-        # request.form["player_name"]
-        #
-        player_name = request.form.get(
-            "player_name"
-        )
+        player_name = request.form.get("player_name")
 
-        # redirect sends user elsewhere
-        #
-        # url_for("week")
-        #
-        # means:
-        #
-        # find route linked to:
-        #
-        # def week()
-        #
-        # Flask creates URL automatically
-        #
-        # Result:
-        #
-        # /week?player_name=Rob
-        #
-        return redirect(
-            url_for(
-                "week",
-                player_name=player_name
-            )
-        )
+        return redirect(url_for("week", player_name=player_name))
 
-    # If GET request:
-    #
-    # Show start screen
-    return render_template(
-        "start.html"
-    )
-
-
-# --------------------------------------------------
-# GAME PAGE
-# --------------------------------------------------
-
-@app.route(
-    "/week",
-    methods=["GET", "POST"]
-)
-def week():
-
-    player_name = request.args.get(
-        "player_name",
-        "Player"
-    )
-
-    spend = 0
-    save = 0
-    share = 0
-    error = None
-
-    if request.method == "POST":
-
-        result = validate_money_allocation(
-            request.form.get("spend", 0),
-            request.form.get("save", 0),
-            request.form.get("share", 0),
-        )
-
-        if result["is_valid"]:
-            spend = result["spend"]
-            save = result["save"]
-            share = result["share"]
-        else:
-            error = result["error"]
-
-    goal_progress = calculate_goal_progress(
-        save,
-        BIKE_GOAL["target"]
-    )
-
-    event = get_random_event()
-
-    return render_template(
-        "week.html",
-        player_name=player_name,
-        allowance=WEEKLY_ALLOWANCE,
-        spend=spend,
-        save=save,
-        share=share,
-        error=error,
-        goal=BIKE_GOAL,
-        goal_progress=goal_progress,
-        event=event,
-    )
+    return render_template("start.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -235,14 +100,10 @@ def register():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        password_hash = generate_password_hash(
-            password
-        )
+        password_hash = generate_password_hash(password)
 
         new_user = UserAccount(
-            username=username,
-            email=email,
-            password_hash=password_hash
+            username=username, email=email, password_hash=password_hash
         )
 
         db_session = get_session()
@@ -251,24 +112,18 @@ def register():
             db_session.add(new_user)
             db_session.commit()
 
-            return redirect(
-                url_for("home")
-            )
+            return redirect(url_for("home"))
 
         except IntegrityError:
             db_session.rollback()
 
-            error = (
-                "That username or email is already registered."
-            )
+            error = "That username or email is already registered."
 
         finally:
             db_session.close()
 
-    return render_template(
-        "register.html",
-        error=error
-    )
+    return render_template("register.html", error=error)
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -295,44 +150,34 @@ def login():
             if user is None:
                 error = "Username/email or password is incorrect."
 
-            elif not check_password_hash(
-                user.password_hash,
-                password
-            ):
+            elif not check_password_hash(user.password_hash, password):
                 error = "Username/email or password is incorrect."
 
             else:
                 session["user_id"] = user.id
                 session["username"] = user.username
 
-                return redirect(
-                    url_for("home")
-                )
+                return redirect(url_for("home"))
 
         finally:
             db_session.close()
 
-    return render_template(
-        "login.html",
-        error=error
-    )
+    return render_template("login.html", error=error)
+
 
 @app.route("/logout")
 def logout():
 
     session.clear()
 
-    return redirect(
-        url_for("home")
-    )
+    return redirect(url_for("home"))
+
 
 @app.route("/add-child", methods=["GET", "POST"])
 def add_child():
 
     if "user_id" not in session:
-        return redirect(
-            url_for("login")
-        )
+        return redirect(url_for("login"))
 
     error = None
 
@@ -341,38 +186,34 @@ def add_child():
         child_name = request.form.get("child_name")
         age_raw = request.form.get("age")
 
-        if not child_name:
-            error = "Child name is required."
+        validation = validate_child_form(
+            child_name,
+            age_raw,
+        )
 
-        else:
-            age = None
+        if not validation["is_valid"]:
+            error = validation["error"]
 
-            if age_raw:
-                age = int(age_raw)
+            return render_template("add_child.html", error=error)
 
-            db_session = get_session()
+        age = validation["age"]
 
-            try:
-                child = ChildProfile(
-                    user_id=session["user_id"],
-                    child_name=child_name,
-                    age=age
-                )
+        db_session = get_session()
 
-                db_session.add(child)
-                db_session.commit()
+        try:
+            child = ChildProfile(
+                user_id=session["user_id"], child_name=child_name, age=age
+            )
 
-                return redirect(
-                    url_for("home")
-                )
+            db_session.add(child)
+            db_session.commit()
 
-            finally:
-                db_session.close()
+            return redirect(url_for("home"))
 
-    return render_template(
-        "add_child.html",
-        error=error
-    )
+        finally:
+            db_session.close()
+
+    return render_template("add_child.html", error=error)
 
 
 @app.route("/select-child", methods=["GET", "POST"])
@@ -391,10 +232,7 @@ def select_child():
 
             child = (
                 db_session.query(ChildProfile)
-                .filter_by(
-                    id=child_id,
-                    user_id=session["user_id"]
-                )
+                .filter_by(id=child_id, user_id=session["user_id"])
                 .first()
             )
 
@@ -408,19 +246,193 @@ def select_child():
                 return redirect(url_for("home"))
 
         children = (
-            db_session.query(ChildProfile)
-            .filter_by(user_id=session["user_id"])
-            .all()
+            db_session.query(ChildProfile).filter_by(user_id=session["user_id"]).all()
         )
 
     finally:
         db_session.close()
 
+    return render_template("select_child.html", children=children, error=error)
+
+
+@app.route("/child-settings", methods=["GET", "POST"])
+def child_settings():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if "active_child_id" not in session:
+        return redirect(url_for("select_child"))
+
+    error = None
+    success = None
+
+    db_session = get_session()
+
+    try:
+        child = (
+            db_session.query(ChildProfile)
+            .filter_by(
+                id=session["active_child_id"],
+                user_id=session["user_id"],
+            )
+            .first()
+        )
+
+        if child is None:
+            session.pop("active_child_id", None)
+            session.pop("active_child_name", None)
+
+            return redirect(url_for("select_child"))
+
+        if request.method == "POST":
+
+            allowance_raw = request.form.get("weekly_allowance")
+
+            try:
+                weekly_allowance = int(allowance_raw)
+
+            except ValueError:
+                error = "Weekly pocket money must be a whole number."
+
+            else:
+                if weekly_allowance < 0:
+                    error = "Weekly pocket money cannot be negative."
+
+                else:
+                    child.weekly_allowance = weekly_allowance
+                    db_session.commit()
+
+                    session["active_child_name"] = child.child_name
+
+                    success = "Settings saved."
+
+        child_data = {
+            "id": child.id,
+            "child_name": child.child_name,
+            "weekly_allowance": child.weekly_allowance,
+        }
+
+    finally:
+        db_session.close()
+
     return render_template(
-        "select_child.html",
-        children=children,
-        error=error
+        "child_settings.html",
+        child=child_data,
+        error=error,
+        success=success,
     )
+
+
+# --------------------------------------------------
+# GAME PAGE
+# --------------------------------------------------
+
+
+@app.route("/weekly_allocation", methods=["GET", "POST"])
+def weekly_allocation():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if "active_child_id" not in session:
+        return redirect(url_for("select_child"))
+
+    error = None
+    success = None
+    event = get_random_event()
+
+    db_session = get_session()
+
+    try:
+        child = (
+            db_session.query(ChildProfile)
+            .filter_by(
+                id=session["active_child_id"],
+                user_id=session["user_id"],
+            )
+            .first()
+        )
+
+        if child is None:
+            session.pop("active_child_id", None)
+            session.pop("active_child_name", None)
+            return redirect(url_for("select_child"))
+
+        latest_allocation = (
+            db_session.query(WeeklyAllocation)
+            .filter_by(child_id=child.id)
+            .order_by(WeeklyAllocation.week_number.desc())
+            .first()
+        )
+
+        if latest_allocation is None:
+            week_number = 1
+            allocation = None
+        else:
+            week_number = latest_allocation.week_number + 1
+            allocation = latest_allocation
+
+        if request.method == "POST":
+
+            result = validate_money_allocation(
+                request.form.get("spend", 0),
+                request.form.get("save", 0),
+                request.form.get("share", 0),
+                allowance=child.weekly_allowance,
+            )
+
+            if not result["is_valid"]:
+                error = result["error"]
+
+            else:
+                new_allocation = WeeklyAllocation(
+                    child_id=child.id,
+                    week_number=week_number,
+                    allowance=child.weekly_allowance,
+                    spend=result["spend"],
+                    save=result["save"],
+                    share=result["share"],
+                )
+
+                db_session.add(new_allocation)
+                db_session.commit()
+
+                success = "Weekly allocation saved."
+
+                allocation = new_allocation
+                week_number = new_allocation.week_number
+
+        child_data = {
+            "id": child.id,
+            "child_name": child.child_name,
+            "weekly_allowance": child.weekly_allowance,
+        }
+
+        allocation_data = None
+
+        if allocation is not None:
+            allocation_data = {
+                "week_number": allocation.week_number,
+                "allowance": allocation.allowance,
+                "spend": allocation.spend,
+                "save": allocation.save,
+                "share": allocation.share,
+            }
+
+    finally:
+        db_session.close()
+
+    return render_template(
+        "weekly_allocation.html",
+        child=child_data,
+        week_number=week_number,
+        allocation=allocation_data,
+        event=event,
+        error=error,
+        success=success,
+    )
+
 
 # --------------------------------------------------
 # RUN APPLICATION
@@ -428,32 +440,6 @@ def select_child():
 
 if __name__ == "__main__":
 
-    # Read environment variable
-    #
-    # APP_ENV=dev
-    #
-    # returns True
-    #
-    # Anything else:
-    # False
-    #
-    debug_mode = (
-        os.getenv("APP_ENV")
-        == "dev"
-    )
+    debug_mode = os.getenv("APP_ENV") == "dev"
 
-    # Start local web server
-    #
-    # Default:
-    #
-    # http://127.0.0.1:5000
-    #
-    # debug=True means:
-    #
-    # - auto reload
-    # - error messages
-    # - developer tools
-    #
-    app.run(
-        debug=debug_mode
-    )
+    app.run(debug=debug_mode)

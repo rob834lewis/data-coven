@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>
+        {% block title %}Finance Ferret{% endblock %}
+    </title>
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Fredoka:wght@500;600&display=swap"
+          rel="stylesheet">
+
+    <link rel="icon"
+        href="{{ url_for('static', filename='img/favicon.png') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="site-header">
+
+        <div class="header-content">
+
+            <img
+                src="{{ url_for('static', filename='img/banner_ferret_facing_left.png') }}"
+                alt="Finance Ferret Mascot"
+                class="mascot"
+            >
+
+            <div class="header-text">
+
+                <h1>Finance Ferret</h1>
+
+                <p>
+                    Learn money by building your stash.
+                </p>
+
+            </div>
+
+            {% if session.get("username") %}
+                <div class="logged-in-user">
+                    Parent Account: <br>
+                    <strong>{{ session["username"] }}</strong>
+                </div>
+            {% endif %}
+
+        </div>
+
+        {% if session.get("user_id") %}
+
+            <nav>
+                <a href="/">Home</a>
+                <a href="/weekly_allocation">Weekly Money</a>
+                <a href="/select-child">Children</a>
+                <a href="/child-settings">Settings</a>
+                <a href="/logout">Logout</a>
+            </nav>
+
+        {% else %}
+
+            <nav>
+                <a href="/">Home</a>
+                <a href="/register">Register</a>
+                <a href="/login">Login</a>
+            </nav>
+
+        {% endif %}
+
+    </header>
+
+    <main class="page">
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>

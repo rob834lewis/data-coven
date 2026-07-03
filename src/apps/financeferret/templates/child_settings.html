@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Finance Ferret{% endblock %}
+
+{% block content %}
+
+    <h1>Child Settings</h1>
+
+    {% if error %}
+        <p style="color: red;">
+            {{ error }}
+        </p>
+    {% endif %}
+
+    {% if success %}
+        <p style="color: green;">
+            {{ success }}
+        </p>
+    {% endif %}
+
+    <p>
+        Active child:
+        <strong>{{ child.child_name }}</strong>
+    </p>
+
+    <form method="POST" action="/child-settings">
+
+        <label for="weekly_allowance">
+            Weekly pocket money
+        </label>
+
+        <input
+            type="number"
+            id="weekly_allowance"
+            name="weekly_allowance"
+            min="0"
+            value="{{ child.weekly_allowance }}"
+            required
+        >
+
+        <br><br>
+
+        <button type="submit">
+            Save settings
+        </button>
+
+    </form>
+
+    <p>
+        <a href="/">Back to home</a>
+    </p>
+
+{% endblock %}

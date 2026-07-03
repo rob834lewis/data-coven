@@ -226,3 +226,5 @@ __marimo__/
 *.vmdk
 
 data/
+
+vscode.env
