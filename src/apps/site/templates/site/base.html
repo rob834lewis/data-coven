@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>
+    {% block title %}
+    Data Coven
+    {% endblock %}
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<header>
+
+    <h1>Data Coven</h1>
+
+    <nav>
+
+        <a href="{{ url_for('site.home') }}">Home</a>
+
+    </nav>
+
+</header>
+
+<main>
+
+{% block content %}
+
+{% endblock %}
+
+</main>
+
+<footer>
+
+    © {{ current_year }} Rob Lewis
+
+</footer>
+
+</body>
+
+</html>
